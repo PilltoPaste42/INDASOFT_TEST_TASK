@@ -1,5 +1,6 @@
 USE EVENTFRAME;
 GO
+
 CREATE TYPE ParametersTableType AS TABLE
 	(
 		Name NVARCHAR(50),

@@ -8,7 +8,10 @@ CREATE OR ALTER PROCEDURE AddLink
 	@linkId NVARCHAR(50) OUTPUT
 ) AS 
 BEGIN
-	DECLARE @TableVar TABLE([Id] [uniqueidentifier]);
+	DECLARE @TableVar TABLE
+	(
+		Id uniqueidentifier
+	);
 
 	INSERT INTO Links
 	(
@@ -17,7 +20,7 @@ BEGIN
 		ChildEventFrameId,
 		ChildEventFrameTypeId
 	)
-	OUTPUT INSERTED.[Id] INTO @TableVar
+	OUTPUT INSERTED.Id INTO @TableVar
 	VALUES
 	(
 		@parentEventId,
@@ -26,5 +29,5 @@ BEGIN
 		(SELECT EventFrameTypeId FROM EventFrames WHERE Id = @childEventId)
 	);
 
-	SET @linkId = CAST((SELECT [Id] FROM @TableVar)AS NVARCHAR(50)) ;
+	SET @linkId = CAST((SELECT Id FROM @TableVar)AS NVARCHAR(50)) ;
 END

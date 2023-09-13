@@ -8,15 +8,18 @@ CREATE OR ALTER PROCEDURE AddEventFrame
 	@batchId NVARCHAR(50) OUTPUT
 ) AS 
 BEGIN
-	DECLARE @TableVar TABLE([Id] [uniqueidentifier]);
+	DECLARE @TableVar TABLE
+	(
+		Id uniqueidentifier
+	);
 
 	INSERT INTO EventFrames (Name, EventFrameTypeId)
-	OUTPUT INSERTED.[Id] INTO @TableVar
+	OUTPUT INSERTED.Id INTO @TableVar
 	SELECT
 		@eventName,
 		T.Id
 	FROM dbo.EventFrameTypes AS T
 	WHERE T.Name = @eventType
 	
-	SET @batchId = CAST((SELECT [Id] FROM @TableVar)AS NVARCHAR(50)) ; 
+	SET @batchId = CAST((SELECT Id FROM @TableVar)AS NVARCHAR(50)) ; 
 END

@@ -8,22 +8,22 @@ CREATE OR ALTER PROCEDURE AddEventFrameValues
 ) AS 
 BEGIN
 	DECLARE @eventTypeId NVARCHAR(50);
-	SET @eventTypeId=(SELECT EventFrameTypeId FROM dbo.EventFrames WHERE Id = @eventId);
+	SET @eventTypeId=(SELECT EventFrameTypeId FROM EventFrames WHERE Id = @eventId);
 	
-	INSERT INTO dbo.EventFrameValues (EventFrameId, UserfieldId, ValueText, ValueInt, ValueFloat, ValueDatetime)
+	INSERT INTO EventFrameValues (EventFrameId, UserfieldId, ValueText, ValueInt, ValueFloat, ValueDatetime)
 	SELECT 
 		@eventId, 
-		T.Id, 
-		IIF(T.Type = 'Текст', P.Value, NULL), 
-		IIF(T.Type = 'Целое число', CAST(P.Value AS INT), NULL), 
-		IIF(T.Type = 'Вещественное число', CAST(P.Value AS FLOAT), NULL), 
-		IIF(T.Type = 'Дата', CAST(P.Value AS DATETIME), NULL)
+		TV.Id, 
+		IIF(TV.Type = 'Текст', P.Value, NULL), 
+		IIF(TV.Type = 'Целое число', CAST(P.Value AS INT), NULL), 
+		IIF(TV.Type = 'Вещественное число', CAST(P.Value AS FLOAT), NULL), 
+		IIF(TV.Type = 'Дата', CAST(P.Value AS DATETIME), NULL)
 	FROM 
 		@Params AS P,
-		dbo.EventFrameTypeValues AS T
+		EventFrameTypeValues AS TV
 	WHERE
-		T.EventFrameTypeId = @eventTypeId
-		AND P.Name = T.Name
+		TV.EventFrameTypeId = @eventTypeId
+		AND P.Name = TV.Name
 
 	RETURN 0;
 END

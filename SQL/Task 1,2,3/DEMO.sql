@@ -1,12 +1,14 @@
 USE EVENTFRAME; 
 GO
 
+-- Создание кадров "Партия" и "Блок"
 DECLARE @batchId NVARCHAR(50);
 DECLARE @blockId NVARCHAR(50);
 
 EXECUTE AddEventFrame 'Партия 54321-10', 'Партия', @batchId OUTPUT;
-EXECUTE AddEventFrame 'Блок ТЕСТ 99-98', 'Блок', @blockId OUTPUT;
+EXECUTE AddEventFrame 'Блок 99-98', 'Блок', @blockId OUTPUT;
 
+-- Создание таблиц значений для кадров
 DECLARE @BatchParams AS ParametersTableType;
 DECLARE @BlockParams AS ParametersTableType;
 
@@ -52,26 +54,21 @@ INSERT INTO @BlockParams (Name, Value) VALUES
 	('Дата (послед. изм.)', '01.03.2023'),
 	('Масса, кг', '4700')
 
+-- Создание значений в EventFrameValues для кадров
 EXEC AddEventFrameValues @batchId, @BatchParams;
 EXEC AddEventFrameValues @blockId, @BlockParams;
 
---EXEC SelectEventsWithValuesById @batchId;
---EXEC SelectEventsWithValuesById @blockId;
+-- Вывод кадров и их значений
+EXEC SelectEventsWithValuesById @batchId;
+EXEC SelectEventsWithValuesById @blockId;
 
-DECLARE @batchNumber NVARCHAR(50) = '54321-10';
-DECLARE @parameterName NVARCHAR(50) = 'Фракция (LIMS)';
-DECLARE @newParameterValue NVARCHAR(100) = 'Работает!'
+-- Создание связи между партией и блоком
+DECLARE @linkId NVARCHAR(50);
+EXEC AddLink @batchId, @blockId, @linkId OUTPUT;
 
-EXEC UpdateBatchParameter @batchNumber, @parameterName, @newParameterValue
-EXEC SelectEventsWithValuesById @batchId
+-- Вывод связи
+SELECT * FROM Links WHERE ParentEventFrameId=@batchId
 
-
-
---DECLARE @linkId NVARCHAR(50);
-
---EXEC AddLink @batchId, @blockId, @linkId OUTPUT;
-
---SELECT * FROM Links WHERE ParentEventFrameId=@batchId
-
---DELETE FROM Links WHERE Id=@linkId;
-DELETE FROM dbo.EventFrames WHERE Id=@batchId OR Id=@blockId;
+-- Удаление демонстрационных данных из БД
+DELETE FROM Links WHERE Id=@linkId;
+DELETE FROM EventFrames WHERE Id=@batchId OR Id=@blockId;
