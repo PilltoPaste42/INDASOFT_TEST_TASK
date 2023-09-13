@@ -1,3 +1,6 @@
+USE EVENTFRAME;
+GO
+
 SELECT 
 	F.Name AS Event,
 	TV.Name AS ValueName,
@@ -5,14 +8,13 @@ SELECT
 	V.ValueFloat,
 	V.ValueInt,
 	V.ValueDatetime
-FROM 
-	EventFrames AS F,
-	EventFrameTypes AS T,
-	EventFrameTypeValues AS TV,
-	EventFrameValues AS V
-WHERE
-	T.Id = F.EventFrameTypeId
-	AND TV.EventFrameTypeId = T.Id
-	AND V.EventFrameId = F.Id
+FROM EventFrames AS F
+JOIN EventFrameTypes AS T
+	ON T.Id = F.EventFrameTypeId
+JOIN EventFrameTypeValues AS TV
+	ON TV.EventFrameTypeId = T.Id
+JOIN EventFrameValues AS V
+	ON V.EventFrameId = F.Id
 	AND V.UserfieldId = TV.Id
+
 ORDER BY Event

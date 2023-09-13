@@ -4,12 +4,11 @@ GO
 SELECT 
 	F.Id,
 	F.Name
-FROM 
-	EventFrames AS F,
-	EventFrameTypes AS T
+FROM EventFrames AS F
+JOIN EventFrameTypes AS T
+	ON T.Name = 'Блок'
 WHERE 
-	T.Name = 'Блок'
-	AND F.EventFrameTypeId = T.Id
+	F.EventFrameTypeId = T.Id
 	AND NOT EXISTS
 	(
 		SELECT * 

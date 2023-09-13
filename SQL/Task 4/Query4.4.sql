@@ -26,8 +26,7 @@ SELECT
 	(
 		SELECT COUNT(TV.Type) 
 		FROM EventFrameTypeValues AS TV
-		WHERE 
-TV.EventFrameTypeId = T.Id
+		WHERE TV.EventFrameTypeId = T.Id
 	) AS AllValues
 	
 FROM EventFrameTypes AS T
