@@ -15,4 +15,8 @@
     <Folder Include="Persistence\Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SampleAnalysis.Domain\SampleAnalysis.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

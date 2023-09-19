@@ -1,0 +1,59 @@
+﻿{
+   "CodeGenerationMode": 3,
+   "ContextClassName": "EVENTFRAMEContext",
+   "ContextNamespace": null,
+   "DefaultDacpacSchema": null,
+   "FilterSchemas": false,
+   "IncludeConnectionString": true,
+   "ModelNamespace": null,
+   "OutputContextPath": null,
+   "OutputPath": "Models",
+   "PreserveCasingWithRegex": true,
+   "ProjectRootNamespace": "SampleAnalysis.Domain",
+   "Schemas": null,
+   "SelectedHandlebarsLanguage": 0,
+   "SelectedToBeGenerated": 0,
+   "T4TemplatePath": null,
+   "Tables": [
+      {
+         "Name": "[dbo].[EventFrames]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[EventFrameTypes]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[EventFrameTypeValues]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[EventFrameValues]",
+         "ObjectType": 0
+      },
+      {
+         "Name": "[dbo].[Links]",
+         "ObjectType": 0
+      }
+   ],
+   "UiHint": "suk-desk-000\\sqlexpress.EVENTFRAME.dbo",
+   "UncountableWords": null,
+   "UseBoolPropertiesWithoutDefaultSql": false,
+   "UseDatabaseNames": true,
+   "UseDateOnlyTimeOnly": false,
+   "UseDbContextSplitting": false,
+   "UseFluentApiOnly": false,
+   "UseHandleBars": false,
+   "UseHierarchyId": false,
+   "UseInflector": true,
+   "UseLegacyPluralizer": false,
+   "UseManyToManyEntity": false,
+   "UseNoDefaultConstructor": false,
+   "UseNoObjectFilter": false,
+   "UseNodaTime": false,
+   "UseNullableReferences": false,
+   "UseSchemaFolders": false,
+   "UseSchemaNamespaces": false,
+   "UseSpatial": false,
+   "UseT4": false
+}
