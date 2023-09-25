@@ -1,6 +1,8 @@
 namespace SampleAnalysis.WebAPI;
 
+using SampleAnalysis.Application;
 using SampleAnalysis.Infrastructure;
+using SampleAnalysis.Infrastructure.Persistence;
 
 public class Program
 {
@@ -10,6 +12,7 @@ public class Program
 
         // Add services to the container.
         builder.Services.AddInfrastructureServices(builder.Configuration);
+        builder.Services.AddApplicationServices();
 
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -23,6 +26,12 @@ public class Program
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var initialiser = scope.ServiceProvider.GetRequiredService<AppDbContextInitializer>();
+                _ = initialiser.InitialiseAsync();
+            }
         }
 
         app.UseAuthorization();
