@@ -2,15 +2,15 @@
 
 using FluentValidation.Results;
 
-public class ValidationException : Exception
+public class AppValidationException : Exception
 {
-    public ValidationException()
+    public AppValidationException()
         : base("One or more validation failures have occurred.")
     {
         Errors = new Dictionary<string, string[]>();
     }
 
-    public ValidationException(IEnumerable<ValidationFailure> failures)
+    public AppValidationException(IEnumerable<ValidationFailure> failures)
         : this()
     {
         Errors = failures
