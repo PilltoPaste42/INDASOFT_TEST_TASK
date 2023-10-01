@@ -4,6 +4,8 @@ using FluentValidation;
 
 using Mediator;
 
+using SampleAnalysis.Application.Common.Exceptions;
+
 public class ValidationBehavior<TMessage, TResponse> : IPipelineBehavior<TMessage, TResponse>
     where TMessage : IMessage
 {
@@ -32,7 +34,7 @@ public class ValidationBehavior<TMessage, TResponse> : IPipelineBehavior<TMessag
 
             if (failures.Any())
             {
-                throw new ValidationException(failures);
+                throw new AppValidationException(failures);
             }
         }
 
