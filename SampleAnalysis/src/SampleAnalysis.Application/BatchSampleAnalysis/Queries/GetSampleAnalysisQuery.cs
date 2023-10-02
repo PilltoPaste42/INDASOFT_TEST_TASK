@@ -4,14 +4,16 @@ using Mediator;
 
 using SampleAnalysis.Application.Common.Interfaces;
 
-public record GetSampleAnalysisQuery : IQuery<IEnumerable<SampleAnalysisDto>>
+public record GetSampleAnalysisQuery : IQuery<SampleAnalysisResultDto>
+
 {
     public string? BatchNumber { get; set; }
     public DateTime? BeginDate { get; set; }
     public DateTime? EndDate { get; set; }
 }
 
-public class GetSampleAnalysisQueryHandler : IQueryHandler<GetSampleAnalysisQuery, IEnumerable<SampleAnalysisDto>>
+
+public class GetSampleAnalysisQueryHandler : IQueryHandler<GetSampleAnalysisQuery, SampleAnalysisResultDto>
 {
     private readonly IAppDbContext _context;
 
@@ -20,64 +22,62 @@ public class GetSampleAnalysisQueryHandler : IQueryHandler<GetSampleAnalysisQuer
         _context = context;
     }
 
-    public async ValueTask<IEnumerable<SampleAnalysisDto>> Handle(GetSampleAnalysisQuery query,
+    public async ValueTask<SampleAnalysisResultDto> Handle(GetSampleAnalysisQuery query,
         CancellationToken cancellationToken)
     {
-        var result =
-            (
-                from links in _context.Links
-                join batchT in _context.EventFrameTypes
-                    on new { a = "Партия", b = links.ParentEventFrameTypeId }
-                    equals new { a = batchT.Name, b = batchT.Id }
-                join sampleT in _context.EventFrameTypes
-                    on new { a = "Образец", b = links.ChildEventFrameTypeId }
-                    equals new { a = sampleT.Name, b = sampleT.Id }
-                join batchNumberTV in _context.EventFrameTypeValues
-                    on new { a = "Номер партии", b = batchT.Id }
-                    equals new { a = batchNumberTV.Name, b = batchNumberTV.EventFrameTypeId }
-                join batchProdDateTV in _context.EventFrameTypeValues
-                    on new { a = "Дата изготовления", b = batchT.Id }
-                    equals new { a = batchProdDateTV.Name, b = batchProdDateTV.EventFrameTypeId }
-                join sampleTV in _context.EventFrameTypeValues
-                    on new { a = true, b = sampleT.Id }
-                    equals new { a = sampleTV.Name.Contains("%"), b = sampleTV.EventFrameTypeId }
-                join batches in _context.EventFrames
-                    on new { a = batchT.Id, b = links.ParentEventFrameId }
-                    equals new { a = batches.EventFrameTypeId, b = batches.Id }
-                join samples in _context.EventFrames
-                    on new { a = sampleT.Id, b = links.ChildEventFrameId }
-                    equals new { a = samples.EventFrameTypeId, b = samples.Id }
-                join batchNumber in _context.EventFrameValues
-                    on new { a = batches.Id, b = batchNumberTV.Id }
-                    equals new { a = batchNumber.EventFrameId, b = batchNumber.UserfieldId }
-                join batchProdDate in _context.EventFrameValues
-                    on new { a = batches.Id, b = batchProdDateTV.Id }
-                    equals new { a = batchProdDate.EventFrameId, b = batchProdDate.UserfieldId }
-                join sampleV in _context.EventFrameValues
-                    on new { a = samples.Id, b = sampleTV.Id }
-                    equals new { a = sampleV.EventFrameId, b = sampleV.UserfieldId }
-                where
-                    batchNumber.ValueText == (query.BatchNumber ?? batchNumber.ValueText)
-                    && batchProdDate.ValueDatetime >= (query.BeginDate ?? batchProdDate.ValueDatetime)
-                    && batchProdDate.ValueDatetime <= (query.EndDate ?? batchProdDate.ValueDatetime)
-                group new
-                    {
-                        BatchNumber = batchNumber.ValueText,
-                        Parameter = sampleTV.Name,
-                        Value = sampleV.ValueFloat
-                    }
-                    by batchNumber.ValueText
-                into res
-                select new SampleAnalysisDto
-                {
-                    BatchNumber = res.Key,
-                    Parameters = from r in res select r.Parameter,
-                    Values = from r in res select r.Value
-                }
-            )
-            .OrderBy(q => q.BatchNumber);
+        var batchType = _context.EventFrameTypes.Single(t => t.Name == "Партия");
+        var sampleType = _context.EventFrameTypes.Single(t => t.Name == "Образец");
 
+        var batchNumberTypeValue = _context.EventFrameTypeValues
+            .Single(t => t.Name == "Номер партии" && t.EventFrameType == batchType);
+        var batchProdDateTypeValue = _context.EventFrameTypeValues
+            .Single(t => t.Name == "Дата изготовления" && t.EventFrameType == batchType);
+        var sampleTypeValue = _context.EventFrameTypeValues
+            .Where(tv => tv.Name.Contains("%") && tv.EventFrameType == sampleType);
 
-        return await new ValueTask<IEnumerable<SampleAnalysisDto>>(result);
+        var sampleResults =
+            from link in _context.Links
+            join batchF in _context.EventFrames
+                on new { a = batchType, b = link.ParentEventFrame }
+                equals new { a = batchF.EventFrameType, b = batchF }
+            join sampleF in _context.EventFrames
+                on new { a = sampleType, b = link.ChildEventFrame }
+                equals new { a = sampleF.EventFrameType, b = sampleF }
+            join batchNumberV in _context.EventFrameValues
+                on new { a = batchF, b = batchNumberTypeValue }
+                equals new { a = batchNumberV.EventFrame, b = batchNumberV.Userfield }
+            join batchProdDateV in _context.EventFrameValues
+                on new { a = batchF, b = batchProdDateTypeValue }
+                equals new { a = batchProdDateV.EventFrame, b = batchProdDateV.Userfield }
+            join sampleTV in sampleTypeValue
+                on sampleType equals sampleTV.EventFrameType
+            join sampleV in _context.EventFrameValues
+                on new { a = sampleF, b = sampleTV }
+                equals new { a = sampleV.EventFrame, b = sampleV.Userfield }
+            where
+                batchNumberV.ValueText == (query.BatchNumber ?? batchNumberV.ValueText)
+                && batchProdDateV.ValueDatetime >= (query.BeginDate ?? batchProdDateV.ValueDatetime)
+                && batchProdDateV.ValueDatetime <= (query.EndDate ?? batchProdDateV.ValueDatetime)
+            group new
+            {
+                BatchNumber = batchNumberV.ValueText,
+                SampleValue = sampleV.ValueFloat
+            } by batchNumberV.ValueText
+            into res
+            select new SampleAnalysisDto
+            {
+                BatchNumber = res.Key,
+                SampleValues = res.Where(r => r.BatchNumber == res.Key)
+                    .Select(r => r.SampleValue)
+            };
+
+        var result = new SampleAnalysisResultDto
+        {
+            SampleParameters = sampleTypeValue.Select(tv => tv.Name),
+            SampleResults = sampleResults
+        };
+
+        return await new ValueTask<SampleAnalysisResultDto>(result);
+
     }
 }

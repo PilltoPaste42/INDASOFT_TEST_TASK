@@ -20,7 +20,7 @@ public class SampleAnalysisController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<SampleAnalysisDto>>> Get(string? batchNumber, DateTime? beginDate,
+    public async Task<ActionResult<SampleAnalysisResultDto>> Get(string? batchNumber, DateTime? beginDate,
         DateTime? endDate)
     {
         var query = new GetSampleAnalysisQuery
