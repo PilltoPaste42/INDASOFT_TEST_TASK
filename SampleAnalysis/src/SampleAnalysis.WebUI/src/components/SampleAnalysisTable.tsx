@@ -44,8 +44,10 @@ const SampleAnalysisTable = (props, ref: Ref<SampleAnalysisTableRefType>) => {
               <thead>
                 <tr>
                   <th>Номер партии</th>
+
                   {data.sampleParameters.map((param) => 
                   <th>{param}</th>
+
                   )}
                 </tr>
               </thead>
@@ -56,6 +58,7 @@ const SampleAnalysisTable = (props, ref: Ref<SampleAnalysisTableRefType>) => {
                     {result.sampleValues.map(val =>
                       <td>{val}</td>)}
                   </tr>)}
+
               </tbody>
             </table>
           </div>

@@ -3,5 +3,6 @@
 public class SampleAnalysisDto
 {
     public string BatchNumber { get; set; }
+
     public IEnumerable<double?> SampleValues { get; set; }
 }

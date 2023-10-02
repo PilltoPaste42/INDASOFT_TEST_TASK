@@ -5,11 +5,13 @@ using Mediator;
 using SampleAnalysis.Application.Common.Interfaces;
 
 public record GetSampleAnalysisQuery : IQuery<SampleAnalysisResultDto>
+
 {
     public string? BatchNumber { get; set; }
     public DateTime? BeginDate { get; set; }
     public DateTime? EndDate { get; set; }
 }
+
 
 public class GetSampleAnalysisQueryHandler : IQueryHandler<GetSampleAnalysisQuery, SampleAnalysisResultDto>
 {
@@ -76,5 +78,6 @@ public class GetSampleAnalysisQueryHandler : IQueryHandler<GetSampleAnalysisQuer
         };
 
         return await new ValueTask<SampleAnalysisResultDto>(result);
+
     }
 }
